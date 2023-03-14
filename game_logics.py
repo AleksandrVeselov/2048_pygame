@@ -72,3 +72,134 @@ def is_zero_in_mas(mas: list[list]) -> bool:
         if any(map(lambda x: x == 0, row)):
             return True
     return False
+
+
+def move_left(massiv: list[list[int]]) -> list[list[int]]:
+    """
+    Перемещение цифр влево
+    :param massiv: массив игрового поля
+    :return: массив игрового поля со сдвинутыми влево цифрами
+    """
+    for row in massiv:
+
+        # Удаление нулей из массива
+        while 0 in row:
+            row.remove(0)
+
+        # Заполнение нулями свободных ячеек
+        while len(row) != 4:
+            row.append(0)
+
+    # Сложение соседних равных друг другу чисел, не равных нулю
+    for i in range(4):
+        for j in range(3):
+            if massiv[i][j] == massiv[i][j + 1] and massiv[i][j] != 0:
+                massiv[i][j] *= 2
+                massiv[i].pop(j + 1)
+                massiv[i].append(0)
+
+    return massiv
+
+
+def move_right(massiv: list[list[int]]) -> list[list[int]]:
+    """
+    Перемещение цифр влево
+    :param massiv: массив игрового поля
+    :return: массив игрового поля со сдвинутыми вправо цифрами
+    """
+    for row in massiv:
+
+        # Удаление нулей из массива
+        while 0 in row:
+            row.remove(0)
+
+        # Заполнение нулями свободных ячеек
+        while len(row) != 4:
+            row.insert(0, 0)
+
+        # Сложение соседних равных друг другу чисел, не равных нулю
+        for i in range(4):
+            for j in range(3, 0, -1):
+                if massiv[i][j] == massiv[i][j - 1] and massiv[i][j] != 0:
+                    massiv[i][j] *= 2
+                    massiv[i].pop(j - 1)
+                    massiv[i].insert(0, 0)
+
+    return massiv
+
+
+def move_up(massiv: list[list[int]]) -> list[list[int]]:
+    """
+    Смещение цифр игрового поля вверх
+    :param massiv: Массив игрового поля
+    :return: массив игрового поля со сдвинутыми вверх цифрами
+    """
+
+    for j in range(4):
+        column = []  # колонка
+        for i in range(4):
+            # Если элемент из колонки не равен нулю
+            if massiv[i][j] != 0:
+                column.append(massiv[i][j])
+
+        # Заполнение колонки нулями
+        while len(column) != 4:
+            column.append(0)
+
+        # Сложение соседних одинаковых цифр и заполнение пустых мест нулями
+        for i in range(3):
+            if column[i] == column[i + 1] and column[i] != 0:
+                column[i] *= 2
+                column.pop(i + 1)
+                column.append(0)
+
+        # Заполнение колонки цифрами из column
+        for i in range(4):
+            massiv[i][j] = column[i]
+
+    return massiv
+
+
+def move_down(massiv: list[list[int]]) -> list[list[int]]:
+    """
+    Перемещение цифр массива вниз
+    :param massiv: Массив игрового поля
+    :return: массив игрового поля со сдвинутыми вниз цифрами
+    """
+    for j in range(4):
+        column = []   # колонка
+        for i in range(4):
+            # Если элемент из колонки не равен нулю
+            if massiv[i][j] != 0:
+                column.append(massiv[i][j])
+
+        # Заполнение колонки нулями
+        while len(column) != 4:
+            column.insert(0, 0)
+
+        # Сложение соседних одинаковых цифр и заполнение пустых мест нулями
+        for i in range(3, 0, -1):
+            if column[i] == column[i - 1] and column[i] != 0:
+                column[i] *= 2
+                column.pop(i - 1)
+                column.insert(0, 0)
+
+        # Заполнение колонки цифрами из column
+        for i in range(4):
+            massiv[i][j] = column[i]
+
+    return massiv
+
+
+def can_move(massiv: list[list[int]]) -> bool:
+    """
+    Проверка возможно ли еще сдвинуть цифры
+    :param massiv: Массив игрового поля
+    :return: True или False
+    """
+    for i in range(3):
+        for j in range(3):
+            if massiv[i][j] == massiv[i][j + 1] or massiv[i][j] == massiv[i - 1][j]:
+                return True
+    return False
+
