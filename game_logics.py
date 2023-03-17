@@ -1,4 +1,5 @@
 import random
+from typing import Tuple, List
 
 
 def pretty_print(massiv: list[list[int]]) -> None:
@@ -74,12 +75,14 @@ def is_zero_in_mas(mas: list[list]) -> bool:
     return False
 
 
-def move_left(massiv: list[list[int]]) -> list[list[int]]:
+def move_left(massiv: list[list[int]]) -> tuple:
     """
     Перемещение цифр влево
     :param massiv: массив игрового поля
     :return: массив игрового поля со сдвинутыми влево цифрами
     """
+    delta = 0  # на сколько изменятся очки
+
     for row in massiv:
 
         # Удаление нулей из массива
@@ -95,18 +98,21 @@ def move_left(massiv: list[list[int]]) -> list[list[int]]:
         for j in range(3):
             if massiv[i][j] == massiv[i][j + 1] and massiv[i][j] != 0:
                 massiv[i][j] *= 2
+                delta += massiv[i][j]
                 massiv[i].pop(j + 1)
                 massiv[i].append(0)
 
-    return massiv
+    return massiv, delta
 
 
-def move_right(massiv: list[list[int]]) -> list[list[int]]:
+def move_right(massiv: list[list[int]]) -> tuple:
     """
     Перемещение цифр влево
     :param massiv: массив игрового поля
     :return: массив игрового поля со сдвинутыми вправо цифрами
     """
+    delta = 0   # на сколько изменятся очки
+
     for row in massiv:
 
         # Удаление нулей из массива
@@ -122,18 +128,20 @@ def move_right(massiv: list[list[int]]) -> list[list[int]]:
             for j in range(3, 0, -1):
                 if massiv[i][j] == massiv[i][j - 1] and massiv[i][j] != 0:
                     massiv[i][j] *= 2
+                    delta += massiv[i][j]
                     massiv[i].pop(j - 1)
                     massiv[i].insert(0, 0)
 
-    return massiv
+    return massiv, delta
 
 
-def move_up(massiv: list[list[int]]) -> list[list[int]]:
+def move_up(massiv: list[list[int]]) -> tuple:
     """
     Смещение цифр игрового поля вверх
     :param massiv: Массив игрового поля
     :return: массив игрового поля со сдвинутыми вверх цифрами
     """
+    delta = 0   # на сколько изменятся очки
 
     for j in range(4):
         column = []  # колонка
@@ -150,6 +158,7 @@ def move_up(massiv: list[list[int]]) -> list[list[int]]:
         for i in range(3):
             if column[i] == column[i + 1] and column[i] != 0:
                 column[i] *= 2
+                delta += column[i]
                 column.pop(i + 1)
                 column.append(0)
 
@@ -157,15 +166,17 @@ def move_up(massiv: list[list[int]]) -> list[list[int]]:
         for i in range(4):
             massiv[i][j] = column[i]
 
-    return massiv
+    return massiv, delta
 
 
-def move_down(massiv: list[list[int]]) -> list[list[int]]:
+def move_down(massiv: list[list[int]]) -> tuple[list[list[int]], int]:
     """
     Перемещение цифр массива вниз
     :param massiv: Массив игрового поля
     :return: массив игрового поля со сдвинутыми вниз цифрами
     """
+    delta = 0   # на сколько изменятся очки
+
     for j in range(4):
         column = []   # колонка
         for i in range(4):
@@ -181,6 +192,7 @@ def move_down(massiv: list[list[int]]) -> list[list[int]]:
         for i in range(3, 0, -1):
             if column[i] == column[i - 1] and column[i] != 0:
                 column[i] *= 2
+                delta += column[i]
                 column.pop(i - 1)
                 column.insert(0, 0)
 
@@ -188,7 +200,7 @@ def move_down(massiv: list[list[int]]) -> list[list[int]]:
         for i in range(4):
             massiv[i][j] = column[i]
 
-    return massiv
+    return massiv, delta
 
 
 def can_move(massiv: list[list[int]]) -> bool:
