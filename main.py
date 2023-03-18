@@ -4,11 +4,36 @@ from game_logics import *
 import pygame
 import data_base
 
-GAMERS_DB = data_base.return_best_players()
-print(GAMERS_DB)
+GAMERS_DB = data_base.return_best_players()  # Лучшие игроки из базы данных
+USERNAME = None  # Имя пользователя
+
+# Игровое поле
+mas = [[0, 0, 0, 0],
+       [0, 0, 0, 0],
+       [0, 0, 0, 0],
+       [0, 0, 0, 0]]
+
+BLOCKS = 4  # Количество ячеек на графическом экране
+SIZE_BLOCK = 110  # Размер ячейки на графическом экране
+MARGIN = 10  # Отступ между ячейками
+WIDTH = BLOCKS * SIZE_BLOCK + (BLOCKS + 1) * MARGIN  # Ширина графического окна
+HEIGHT = WIDTH + 110  # Высота графического окна
+TITLE_REC = (0, 0, WIDTH, 110)  # координаты начала и конца прямоугольника заголовка
+WHITE = (255, 255, 255)  # Белый цвет
+GRAY = (130, 130, 130)  # Серый цвет
+BLACK = (0, 0, 0)
+TEXT_COLOR = (255, 127, 0)  # цвет текста
+COLORS = {0: (130, 130, 130),
+          2: (255, 255, 255),
+          4: (255, 255, 128),
+          8: (255, 255, 0),
+          16: (255, 155, 0),
+          32: (130, 255, 0)}
+score = 0  # количество набранных очков
 
 
 def draw_top_gamers():
+    """Отрисовка трех лучших игроков"""
     font_top = pygame.font.SysFont('simsun', 22)
     font_gamers = pygame.font.SysFont('simsun', 14)
     text_head = font_top.render('Best tries', True, TEXT_COLOR)
@@ -56,33 +81,58 @@ def draw_interface(game_screen, massiv: list[list[int]], score: int, delta=0) ->
                 text_y = h + (SIZE_BLOCK - font_h) / 2  # координата у цифры
                 screen.blit(text, (text_x, text_y))  # помещение цифры на экран
 
-# Игровое поле
-mas = [[0, 0, 0, 0],
-       [0, 0, 0, 0],
-       [0, 0, 0, 0],
-       [0, 0, 0, 0]]
 
-BLOCKS = 4  # Количество ячеек на графическом экране
-SIZE_BLOCK = 110  # Размер ячейки на графическом экране
-MARGIN = 10  # Отступ между ячейками
-WIDTH = BLOCKS * SIZE_BLOCK + (BLOCKS + 1) * MARGIN  # Ширина графического окна
-HEIGHT = WIDTH + 110  # Высота графического окна
-TITLE_REC = (0, 0, WIDTH, 110)  # координаты начала и конца прямоугольника заголовка
-WHITE = (255, 255, 255)  # Белый цвет
-GRAY = (130, 130, 130)  # Серый цвет
-BLACK = (0, 0, 0)
-TEXT_COLOR = (255, 127, 0)  # цвет текста
-COLORS = {0: (130, 130, 130),
-          2: (255, 255, 255),
-          4: (255, 255, 128),
-          8: (255, 255, 0),
-          16: (255, 155, 0),
-          32: (130, 255, 0)}
-score = 0  # количество набранных очков
+def draw_intro():
+    """Рисование стартового экрана"""
+    img2028 = pygame.image.load('1404598408_1.jpg')  # Загрузка каринки
+    font = pygame.font.SysFont('stxingkai', 70)  # Задание шрифта
+    text_welcome = font.render('Welcome! ', True, WHITE)
+    name = 'Введите имя'  # Имя
+    is_find_name = False  # Флаг для выхода из цикла
+
+    # Основной цикл
+    while not is_find_name:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            elif event.type == pygame.KEYDOWN:
+                # Если нажата клавиша с буквой
+                if event.unicode.isalpha():
+                    if name == 'Введите имя':
+                        name = event.unicode
+                    else:
+                        name += event.unicode
+
+                # Если нажата BACKSPASE - удаление символов
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+
+                # Если нажата ENTER - запись имени в переменную
+                elif event.key == pygame.K_RETURN:
+                    if len(name) > 2:
+                        global USERNAME
+                        USERNAME = name
+                        is_find_name = True
+
+        screen.fill(BLACK)  # Заливка экрана черным цветом
+        text_name = font.render(name, True, WHITE)
+        rect_name = text_name.get_rect()
+        rect_name.center = screen.get_rect().center
+        screen.blit(pygame.transform.scale(img2028, [200, 200]), [10, 10])
+        screen.blit(text_welcome, (230, 80))  # отрисовка текста "score"
+        screen.blit(text_name, rect_name)
+        pygame.display.update()
+    screen.fill(BLACK)
+
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Игра 2048')
+
+draw_intro()
 draw_interface(screen, mas, score)
 pygame.display.update()
 
@@ -115,4 +165,4 @@ while is_zero_in_mas(mas) or can_move(mas):
             draw_interface(screen, mas, score, delta)
             pygame.display.update()
 
-#TODO part 9
+#TODO part 11
