@@ -28,7 +28,10 @@ COLORS = {0: (130, 130, 130),
           4: (255, 255, 128),
           8: (255, 255, 0),
           16: (255, 155, 0),
-          32: (130, 255, 0)}
+          32: (130, 255, 0),
+          64: (180, 255, 32),
+          128: (255, 21, 80),
+          256: (200, 81, 255)}
 score = 0  # количество набранных очков
 
 
@@ -127,6 +130,35 @@ def draw_intro():
         pygame.display.update()
     screen.fill(BLACK)
 
+def draw_gameover():
+    """Рисование конечного экрана"""
+    img2028 = pygame.image.load('1404598408_1.jpg')  # Загрузка каринки
+    font = pygame.font.SysFont('stxingkai', 60)  # Задание шрифта
+    text_gameover = font.render('Game over!', True, WHITE)
+    text_score = font.render(f'Вы набрали {score}', True, WHITE)
+    best_score = GAMERS_DB[0][1]  # Лучший результат
+
+    if score > best_score:
+        text = 'Рекорд побит'
+
+    else:
+        text = f'Рекорд {best_score}'
+
+    text_record = font.render(text, True, WHITE)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        screen.fill(BLACK)
+        screen.blit(text_gameover, (230, 80))
+        screen.blit(text_score, (30, 250))
+        screen.blit(text_record, (30, 300))
+        screen.blit(pygame.transform.scale(img2028, [200, 200]), [10, 10])
+        pygame.display.update()
+
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -155,14 +187,19 @@ while is_zero_in_mas(mas) or can_move(mas):
                 mas, delta = move_down(mas)
 
             score += delta  # прибавление дельты к текущему количеству очков
-            empty = get_empty_list(mas)  # Список номеров клеток игрового поля со значением 0
-            random.shuffle(empty)  # Перемешивание списка
-            random_num = empty.pop()  # Удаление из списка номера пустой клетки и запись его в переменную
-            i, j = get_index_from_number(random_num)  # получение координат из номера клетки
-            print(i, j)
-            mas = insert_2_or_4(mas, i, j)  # Вставка по полученным координатам случайного числа (2 или 4)
-            print(mas)
+
+            if is_zero_in_mas(mas):
+                empty = get_empty_list(mas)  # Список номеров клеток игрового поля со значением 0
+                random.shuffle(empty)  # Перемешивание списка
+                random_num = empty.pop()  # Удаление из списка номера пустой клетки и запись его в переменную
+                i, j = get_index_from_number(random_num)  # получение координат из номера клетки
+                print(i, j)
+                mas = insert_2_or_4(mas, i, j)  # Вставка по полученным координатам случайного числа (2 или 4)
+                print(mas)
             draw_interface(screen, mas, score, delta)
             pygame.display.update()
+
+
+draw_gameover()
 
 #TODO part 11
