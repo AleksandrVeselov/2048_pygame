@@ -2,6 +2,25 @@ import sys
 
 from game_logics import *
 import pygame
+import data_base
+
+GAMERS_DB = data_base.return_best_players()
+print(GAMERS_DB)
+
+
+def draw_top_gamers():
+    font_top = pygame.font.SysFont('simsun', 22)
+    font_gamers = pygame.font.SysFont('simsun', 14)
+    text_head = font_top.render('Best tries', True, TEXT_COLOR)
+    screen.blit(text_head, (250, 5))
+
+    index = 0
+    for player in GAMERS_DB:
+        name, score = player
+        header = f'{index + 1}. {name} - {score}'
+        text_gamer = font_gamers.render(header, True, TEXT_COLOR)
+        screen.blit(text_gamer, (250, 30 + 20 * index))
+        index += 1
 
 
 def draw_interface(game_screen, massiv: list[list[int]], score: int, delta=0) -> None:
@@ -19,6 +38,7 @@ def draw_interface(game_screen, massiv: list[list[int]], score: int, delta=0) ->
     if delta > 0:
         text_delta = font_delta.render(f'+{delta}', True, TEXT_COLOR)
         screen.blit(text_delta, (170, 75))  # отрисовка дельты
+    draw_top_gamers()
 
     # Цикл для отрисовки ячеек
     for row in range(BLOCKS):
