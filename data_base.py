@@ -13,6 +13,6 @@ def return_best_players(base=database, count=3) -> list[tuple]:
     return sorted_players[:count]
 
 
-def add_to_database(base: list[tuple], name, score) -> None:
+def add_to_database(name, score) -> None:
     """Добавляет в базу данных результат игрока и его имя"""
-    base.append((name, score))
+    database.append((name, score))

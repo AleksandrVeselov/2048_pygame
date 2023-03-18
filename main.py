@@ -130,13 +130,16 @@ def draw_intro():
         pygame.display.update()
     screen.fill(BLACK)
 
+
 def draw_gameover():
     """Рисование конечного экрана"""
+    global USERNAME
     img2028 = pygame.image.load('1404598408_1.jpg')  # Загрузка каринки
     font = pygame.font.SysFont('stxingkai', 60)  # Задание шрифта
     text_gameover = font.render('Game over!', True, WHITE)
     text_score = font.render(f'Вы набрали {score}', True, WHITE)
     best_score = GAMERS_DB[0][1]  # Лучший результат
+    make_decision = False
 
     if score > best_score:
         text = 'Рекорд побит'
@@ -146,11 +149,19 @@ def draw_gameover():
 
     text_record = font.render(text, True, WHITE)
 
-    while True:
+    while not make_decision:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    make_decision = True
+                    init_const()
+                elif event.key == pygame.K_RETURN:
+                    USERNAME = None
+                    make_decision = True
+                    init_const()
 
         screen.fill(BLACK)
         screen.blit(text_gameover, (230, 80))
@@ -158,48 +169,78 @@ def draw_gameover():
         screen.blit(text_record, (30, 300))
         screen.blit(pygame.transform.scale(img2028, [200, 200]), [10, 10])
         pygame.display.update()
+    screen.fill(BLACK)
+
+
+def game_loop():
+    """Основной цикл игры"""
+    global mas, score
+    draw_interface(screen, mas, score)
+    pygame.display.update()
+
+    # Цикл обработки событий pygame
+    while is_zero_in_mas(mas) or can_move(mas):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                delta = 0
+                if event.key == pygame.K_LEFT:
+                    mas, delta = move_left(mas)  # смещение цифр влево
+
+                elif event.key == pygame.K_RIGHT:
+                    mas, delta = move_right(mas)  # смещение цифр вправо
+                elif event.key == pygame.K_UP:
+                    mas, delta = move_up(mas)
+                elif event.key == pygame.K_DOWN:
+                    mas, delta = move_down(mas)
+
+                score += delta  # прибавление дельты к текущему количеству очков
+
+                if is_zero_in_mas(mas):
+                    empty = get_empty_list(mas)  # Список номеров клеток игрового поля со значением 0
+                    random.shuffle(empty)  # Перемешивание списка
+                    random_num = empty.pop()  # Удаление из списка номера пустой клетки и запись его в переменную
+                    i, j = get_index_from_number(random_num)  # получение координат из номера клетки
+                    print(i, j)
+                    mas = insert_2_or_4(mas, i, j)  # Вставка по полученным координатам случайного числа (2 или 4)
+                    print(mas)
+                draw_interface(screen, mas, score, delta)
+                pygame.display.update()
+
+
+def init_const():
+    global score, mas
+    # Игровое поле
+    mas = [[0, 0, 0, 0],
+           [0, 0, 0, 0],
+           [0, 0, 0, 0],
+           [0, 0, 0, 0]]
+    empty = get_empty_list(mas)
+    random.shuffle(empty)
+    random_num1 = empty.pop()
+    random_num2 = empty.pop()
+    i1, j1 = get_index_from_number(random_num1)
+    i2, j2 = get_index_from_number(random_num2)
+    mas = insert_2_or_4(mas, i1, j1)
+    mas = insert_2_or_4(mas, i2, j2)
+    score = 0
+
+
+mas = None
+score = None
+init_const()
+USERNAME = None
+
 
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Игра 2048')
 
-draw_intro()
-draw_interface(screen, mas, score)
-pygame.display.update()
-
-# Цикл обработки событий pygame
-while is_zero_in_mas(mas) or can_move(mas):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.KEYDOWN:
-            delta = 0
-            if event.key == pygame.K_LEFT:
-                mas, delta = move_left(mas)  # смещение цифр влево
-
-            elif event.key == pygame.K_RIGHT:
-                mas, delta = move_right(mas)  # смещение цифр вправо
-            elif event.key == pygame.K_UP:
-                mas, delta = move_up(mas)
-            elif event.key == pygame.K_DOWN:
-                mas, delta = move_down(mas)
-
-            score += delta  # прибавление дельты к текущему количеству очков
-
-            if is_zero_in_mas(mas):
-                empty = get_empty_list(mas)  # Список номеров клеток игрового поля со значением 0
-                random.shuffle(empty)  # Перемешивание списка
-                random_num = empty.pop()  # Удаление из списка номера пустой клетки и запись его в переменную
-                i, j = get_index_from_number(random_num)  # получение координат из номера клетки
-                print(i, j)
-                mas = insert_2_or_4(mas, i, j)  # Вставка по полученным координатам случайного числа (2 или 4)
-                print(mas)
-            draw_interface(screen, mas, score, delta)
-            pygame.display.update()
-
-
-draw_gameover()
-
-#TODO part 11
+while True:
+    if not USERNAME:
+        draw_intro()
+    game_loop()
+    draw_gameover()
